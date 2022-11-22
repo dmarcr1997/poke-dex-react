@@ -14,13 +14,8 @@ class App extends Component {
     return (
       <div className="App">
         <label></label>
-        <input className='search-box' type='search' placeholder='Search Pokemon' onChange={(e) => {
-          e.preventDefault();
-          this.setState({ filter: e.target.value })
-        }}/>
-        {
-          this.getPokemon()
-        }
+        <input className='search-box' type='search' placeholder='Search Pokemon' onChange={this.handleInputChange}/>
+        { this.getPokemon() }
       </div>
     );
   }
@@ -38,13 +33,19 @@ class App extends Component {
   }
 
   getPokemon() {
-    return this.state.pokemon.filter(p => p.name.includes(this.state.filter))
+    const { pokemon, filter } = this.state
+    return pokemon.filter(p => p.name.toLowerCase().includes(filter))
       .map((poke) => 
         <div key={poke.id}>
           <img src={poke.sprites.front_default} alt={`${poke.name} gif`}/>
           <h1>{poke.name.toUpperCase()}</h1>
         </div>
       )
+  }
+
+  handleInputChange = (e) => {
+    e.preventDefault();
+    this.setState({ filter: e.target.value.toLowerCase() })
   }
 }
 
