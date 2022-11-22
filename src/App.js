@@ -6,19 +6,20 @@ class App extends Component {
     super();
 
     this.state = {
-      pokemon: []
+      pokemon: [],
+      filter: ''
     };
   }
   render() {
     return (
       <div className="App">
+        <label></label>
+        <input className='search-box' type='search' placeholder='Search Pokemon' onChange={(e) => {
+          e.preventDefault();
+          this.setState({ filter: e.target.value })
+        }}/>
         {
-          this.state.pokemon.map((poke) => 
-            <div key={poke.id}>
-              <img src={poke.sprites.front_default} alt={`${poke.name} gif`}/>
-              <h1>{poke.name}</h1>
-            </div>
-          )
+          this.getPokemon()
         }
       </div>
     );
@@ -34,6 +35,15 @@ class App extends Component {
         })
     }
     this.setState({ pokemon: Array.from(dataSet.values()) })
+  }
+
+  getPokemon() {
+    return this.state.pokemon.filter(p => p.name.includes(this.state.filter)).map((poke) => 
+      <div key={poke.id}>
+        <img src={poke.sprites.front_default} alt={`${poke.name} gif`}/>
+        <h1>{poke.name.toUpperCase()}</h1>
+      </div>
+    )
   }
 }
 
