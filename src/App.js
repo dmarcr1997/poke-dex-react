@@ -38,12 +38,13 @@ class App extends Component {
   }
 
   getPokemon() {
-    return this.state.pokemon.filter(p => p.name.includes(this.state.filter)).map((poke) => 
-      <div key={poke.id}>
-        <img src={poke.sprites.front_default} alt={`${poke.name} gif`}/>
-        <h1>{poke.name.toUpperCase()}</h1>
-      </div>
-    )
+    return this.state.pokemon.filter(p => p.name.includes(this.state.filter))
+      .map((poke) => 
+        <div key={poke.id}>
+          <img src={poke.sprites.front_default} alt={`${poke.name} gif`}/>
+          <h1>{poke.name.toUpperCase()}</h1>
+        </div>
+      )
   }
 }
 
