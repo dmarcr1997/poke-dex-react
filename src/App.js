@@ -1,5 +1,7 @@
 import { Component } from 'react'
 import './App.css';
+import PokemonList from './components/card-list/PokemonList.component';
+import Search from './components/search-box/Search.component';
 
 class App extends Component {
   constructor() {
@@ -7,22 +9,25 @@ class App extends Component {
 
     this.state = {
       pokemon: [],
-      filter: ''
+      fltr: ''
     };
   }
   render() {
+    const { handleInputChange } = this;
+    const { pokemon, fltr } = this.state;
+    let searchedPokemon = pokemon.filter(p => p.name.toLowerCase().includes(fltr));
     return (
       <div className="App">
-        <label></label>
-        <input className='search-box' type='search' placeholder='Search Pokemon' onChange={this.handleInputChange}/>
-        { this.getPokemon() }
+        <h1 className="titleText">PokeDex</h1>
+        <Search onSearch={handleInputChange} ph={"Search Pokemon"} className='search-box' />
+        { !!searchedPokemon ? <PokemonList pokemon={searchedPokemon} /> : <h1>Loading...</h1> }
       </div>
     );
   }
 
   async componentDidMount() {
     let dataSet = new Set()
-    for(let i = 1; i <= 20; i++){
+    for(let i = 1; i <= 100; i++){
       await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`) 
         .then(resp => resp.json())
         .then(data => {
@@ -32,20 +37,9 @@ class App extends Component {
     this.setState({ pokemon: Array.from(dataSet.values()) })
   }
 
-  getPokemon() {
-    const { pokemon, filter } = this.state
-    return pokemon.filter(p => p.name.toLowerCase().includes(filter))
-      .map((poke) => 
-        <div key={poke.id}>
-          <img src={poke.sprites.front_default} alt={`${poke.name} gif`}/>
-          <h1>{poke.name.toUpperCase()}</h1>
-        </div>
-      )
-  }
-
   handleInputChange = (e) => {
     e.preventDefault();
-    this.setState({ filter: e.target.value.toLowerCase() })
+    this.setState({ fltr: e.target.value.toLowerCase() })
   }
 }
 
