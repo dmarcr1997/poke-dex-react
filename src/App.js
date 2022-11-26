@@ -1,31 +1,15 @@
-import { Component } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css';
 import PokemonList from './components/card-list/PokemonList.component';
 import Search from './components/search-box/Search.component';
 
-class App extends Component {
-  constructor() {
-    super();
+const App = () => {
+  const [filter, setFilter] = useState("");
+  const [pokemon, setPokemon] = useState([]);
+  const [searchedPokemon, setSelectedPokemon] = useState(pokemon);
+  const [loading, setLoading] = useState(false);
 
-    this.state = {
-      pokemon: [],
-      fltr: ''
-    };
-  }
-  render() {
-    const { handleInputChange } = this;
-    const { pokemon, fltr } = this.state;
-    let searchedPokemon = pokemon.filter(p => p.name.toLowerCase().includes(fltr));
-    return (
-      <div className="App">
-        <h1 className="titleText">PokeDex</h1>
-        <Search onSearch={handleInputChange} ph={"Search Pokemon"} className='search-box' />
-        { !!searchedPokemon ? <PokemonList pokemon={searchedPokemon} /> : <h1>Loading...</h1> }
-      </div>
-    );
-  }
-
-  async componentDidMount() {
+  const getData = async () => {
     let dataSet = new Set()
     for(let i = 1; i <= 100; i++){
       await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`) 
@@ -34,15 +18,41 @@ class App extends Component {
           dataSet.add(data)
         })
     }
-    this.setState({ pokemon: Array.from(dataSet.values()) })
+    return dataSet
   }
+  useEffect(() => {
+    const fetchPokemon = async () => {
+      setLoading(true);
+      const data = await getData();
+      setLoading(false);
+      setPokemon(Array.from(data.values()))
+    }
+    fetchPokemon()
+  }, [])
 
-  handleInputChange = (e) => {
+  useEffect(() => {
+    const newSearchedPokemon = pokemon.filter(p => p.name.toLowerCase().includes(filter));
+    setSelectedPokemon(newSearchedPokemon);
+
+  }, [pokemon, filter])
+
+  const handleInputChange = (e) => {
     e.preventDefault();
-    this.setState({ fltr: e.target.value.toLowerCase() })
+    setFilter( e.target.value.toLowerCase())
   }
-}
 
+  const getLoading = () => {
+    return !loading ? searchedPokemon.length > 0 ? <PokemonList pokemon={searchedPokemon} /> : <h1>Not Found</h1>: <h1>Loading...</h1> 
+  }
+
+  return (
+    <div className="App">
+      <h1 className="titleText">PokeDex</h1>
+      <Search onSearch={handleInputChange} ph={"Search Pokemon"} className='search-box' />
+      { getLoading() }
+    </div>
+  );
+}
 
 
 export default App;
